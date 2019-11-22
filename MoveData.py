@@ -3,14 +3,9 @@ import openpyxl ,datetime, os, xlrd
 import time
 
 def TheSheets(file):
-    if file.endswith(".xls"):
-        wb= xlrd.open_workbook(file)
-        sheets = [ws for ws in wb.sheet_names() if ws =="EMC" or "AREA" in ws.upper()]
-        return wb, sheets
-    elif file.endswith(".xlsx"):
-        wb= openpyxl.load_workbook(file)
-        sheets = [ws for ws in wb.sheetnames if ws =="EMC" or "AREA" in ws.upper()]
-        return wb, sheets
+    wb= openpyxl.load_workbook(file)
+    sheets = [ws for ws in wb.sheetnames if ws =="EMC" or "AREA" in ws.upper()]
+    return wb, sheets
 
 #Copy range of cells as a nested list.[{"Tag":"02-FT-010","Problem":"Blockage"},{"Tag":"04-FV-002","Problem":"Stuck"}]
 def copyRange(copyDict, sheet):
@@ -18,8 +13,7 @@ def copyRange(copyDict, sheet):
     rangeSelected = []
     #Loops through selected Rows. the while is to loop until data is finished
     try:
-        print("start row {} , copy Dict ['tag] {}".format(startRow, copyDict["Tag"]))
-        while "-" in str( sheet.cell(startRow, copyDict["Tag"]).value) or "UNIT" in str( sheet.cell(startRow, copyDict["Tag"]).value).upper():
+        while "-" in sheet.cell(startRow, copyDict["Tag"]).value or "UNIT" in sheet.cell(startRow, copyDict["Tag"]).value.upper():
             rowSelected = {}
             for j in copyDict:
                 rowSelected[j] =str(sheet.cell(startRow, copyDict[j]).value)
@@ -27,9 +21,10 @@ def copyRange(copyDict, sheet):
             rangeSelected.append(rowSelected)
             startRow= startRow + 1
         print("Copy was successful")
-    except IndexError:
+        return rangeSelected
+    except Exception:
         print("copying failed")
-    return rangeSelected
+        return IndexError
 
 #Paste data from copyRange into template sheet
 def pasteRange(copyDict, pasteDict, sheetReceiving, copiedData, datePaste):
@@ -54,66 +49,51 @@ def pasteRange(copyDict, pasteDict, sheetReceiving, copiedData, datePaste):
         countRow += 1
 #this returns the column place for the main headers ex. tag in column 2 and problem in column 3
 def searchRowStarting(sheet, theWord):
-    print(sheet.nrows, sheet.ncols)
-    for i in range(1,9):
-        # if i> 15:
-        #     break
-        for j in range(1,8):
-            # if j> 9:
-            #     break
-            # try:
-            if theWord in str(sheet.cell(i,j).value).upper():
-                if '-' in str(sheet.cell(i+1,j).value):
-                    return i+1, j, "first", sheet.cell(i+1,j).value
-                elif '-' in str(sheet.cell(i+2,j).value):
-                    return i+2, j, "second", sheet.cell(i+2,j).value               
-                    # else:
-            #             return FileExistsError
-            # except IndexError:
-            #     return FileExistsError
+    try:
+        i,j= searchForWordXlsx(sheet,theWord)
+        if '-' in sheet.cell(i+1,j).value or "UNIT" in sheet.cell(i+1,j).value.upper() :
+            return i+1, j, "first", sheet.cell(i+1,j).value
+        elif '-' in sheet.cell(i+2,j).value or "UNIT" in sheet.cell(i+2,j).value.upper():
+            return i+2, j, "second", sheet.cell(i+2,j).value           
+    except:
+        return FileExistsError
 
 def searchForWord(sheet, theWord):
-    f= False
     for i in range(1,sheet.nrows):
-        if f == True or i> 9:
+        if i> 12:
             break
         else:
             for j in range(1,sheet.ncols):
-                if j> 9:
+                if j>12:
                     break
                 elif theWord in str(sheet.cell(i,j).value).upper():
-                    f= True
                     return i, j
 
 def searchForWordXlsx(sheet, theWord):
-    for i in range(1,9):
-        for j in range(1,9):
+    for i in range(1,12):
+        for j in range(1,12):
             if theWord in str(sheet.cell(i,j).value).upper():
                 return i, j
 
 # def moveData(copyFileName, copyFileSheet, pasteFileName, pasteFileSheet):
 def moveData(copyFileName, copyFileSheet, pasteFileName):
+    if pasteFileName.endswith(".xlsx"):
+        pasteFile= openpyxl.load_workbook(pasteFileName)
+        pasteSheet= pasteFile.active
+
     if copyFileName.endswith(".xlsx"):
         wb= openpyxl.load_workbook(copyFileName)
         copySheet= wb[copyFileSheet]
-    elif copyFileName.endswith(".xls"):
-        wb = xlrd.open_workbook(copyFileName)
-        copySheet= wb.sheet_by_name(copyFileSheet)
-    pasteFile = openpyxl.load_workbook(pasteFileName)
-    pasteSheet= pasteFile.active
-    pasteDict, copyDict, dateCopy= dictionaries( copyFileName, copySheet, pasteSheet)
-    print(pasteDict, copyDict, dateCopy)
-    print(searchRowStarting(copySheet,"TAG"))
-    if searchRowStarting(copySheet,"TAG") != FileExistsError and searchRowStarting(copySheet,"TAG") != IndexError:
+        pasteDict, copyDict, dateCopy= dictionaryxlsx( copyFileName, copySheet, pasteSheet)
+
+    if searchRowStarting(copySheet,"TAG") != FileExistsError:
         selectedRange = copyRange(copyDict, copySheet)
         pasteRange(copyDict, pasteDict, pasteSheet, selectedRange, dateCopy) 
         #You can save the template as another file to create a new file here too
         pasteFile.save(pasteFileName)
-        print("All OKKKKKKKKKK")
-    else:
-        print("All failed ybasha!!!")
 
-def dictionaries(copyFileName, copySheet, pasteSheet ):
+
+def dictionaryxlsx(copyFileName, copySheet, pasteSheet ):
     copyDict={}
     pasteDict= {}
     olddateCopy = os.path.basename(copyFileName)
@@ -129,7 +109,7 @@ def dictionaries(copyFileName, copySheet, pasteSheet ):
         pass
 
     try:
-        copyDict["Tag"]= searchForWord(copySheet, "TAG")[1]
+        copyDict["Tag"]= searchForWordXlsx(copySheet, "TAG")[1]
     except TypeError:
         pass
     try:
@@ -137,7 +117,7 @@ def dictionaries(copyFileName, copySheet, pasteSheet ):
     except TypeError:
         pass
     try:
-        copyDict["Problem"]= searchForWord(copySheet,"PROB")[1]
+        copyDict["Problem"]= searchForWordXlsx(copySheet,"PROB")[1]
     except TypeError:
         pass
     try:
@@ -145,7 +125,7 @@ def dictionaries(copyFileName, copySheet, pasteSheet ):
     except TypeError:
         pass
     try:
-        copyDict["Complain"]= searchForWord(copySheet,"COMPLAIN")[1]
+        copyDict["Complain"]= searchForWordXlsx(copySheet,"COMPLAIN")[1]
     except TypeError:
         pass
     try:
@@ -153,15 +133,7 @@ def dictionaries(copyFileName, copySheet, pasteSheet ):
     except TypeError:
         pass
     try:
-        copyDict["Action"]= searchForWord(copySheet,"ACTION")[1]
-    except TypeError:
-        pass
-    try:
-        pasteDict["Status"]= searchForWordXlsx(pasteSheet,"STATUS")[1]
-    except TypeError:
-        pass
-    try:
-        copyDict["Status"]= searchForWord(copySheet,"STATUS")[1]
+        copyDict["Action"]= searchForWordXlsx(copySheet,"ACTION")[1]
     except TypeError:
         pass
     try:

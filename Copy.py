@@ -9,7 +9,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication
-from MoveData import  moveData, TheSheets
+# from MoveData import  moveData, TheSheets
+from MoveData_97 import moveData97, TheSheet97
 import os, time
 
 class Ui_MainWindow(object):
@@ -115,10 +116,16 @@ class Ui_MainWindow(object):
         no_of_Sheets=0
         no_of_Files=0
         for copyFileName in f:
-            _ , wss= TheSheets(copyFileName)
-            no_of_Files= no_of_Files+1
-            for _ in wss:
-                no_of_Sheets= no_of_Sheets+1
+            if copyFileName.endswith('.xlsx'):
+                _ , wss= TheSheet97(copyFileName)
+                no_of_Files= no_of_Files+1
+                for _ in wss:
+                    no_of_Sheets= no_of_Sheets+1
+            if copyFileName.endswith('.xls'):
+                _ , wss= TheSheet97(copyFileName)
+                no_of_Files= no_of_Files+1
+                for _ in wss:
+                    no_of_Sheets= no_of_Sheets+1
         self.progressBar.setMaximum(no_of_Sheets)
         self.label_Status.setText("{} files are found...".format( no_of_Files))
         return self.hh
@@ -145,26 +152,43 @@ class Ui_MainWindow(object):
         self.label_Status.setText("In progress....")
         os.chdir(copyFolder)
         ff= os.listdir(copyFolder)
-        f=[sf for sf in ff if sf.endswith('.xls') or sf.endswith('xlsx')]
+        f97=[sf for sf in ff if sf.endswith('.xls')]
+        f= [sf for sf in ff if sf.endswith('.xlsx')]
         ind2=0
         message=""
         message1=""
         successList=[]
         failList=[]
-        for copyFileName in f:
-            _ , wss= TheSheets(copyFileName)
+        # for copyFileName in f:
+        #     _ , wss= TheSheets(copyFileName)
+        #     for copyFileSheet in wss:
+        #         try:
+        #             messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
+        #             self.label_Status.setText(messageInProgress)
+        #             moveData(copyFileName, copyFileSheet, pasteFileName)
+        #             ind2= ind2+1
+        #             self.increaseIt(ind2)
+        #             if copyFileName not in successList:
+        #                 successList.append(copyFileName)
+        #         except:
+        #             if copyFileName not in failList:
+        #                 failList.append(copyFileName)
+        print(f97)
+        # print(f)
+        for copyFileName in f97:
+            _ , wss= TheSheet97(copyFileName)
             for copyFileSheet in wss:
-                try:
-                    messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
-                    self.label_Status.setText(messageInProgress)
-                    moveData(copyFileName, copyFileSheet, pasteFileName)
-                    ind2= ind2+1
-                    self.increaseIt(ind2)
-                    if copyFileName not in successList:
-                        successList.append(copyFileName)
-                except:
-                    if copyFileName not in failList:
-                        failList.append(copyFileName)
+                # try:
+                messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
+                self.label_Status.setText(messageInProgress)
+                moveData97(copyFileName, copyFileSheet, pasteFileName)
+                ind2= ind2+1
+                self.increaseIt(ind2)
+                # if copyFileName not in successList:
+                #     successList.append(copyFileName)
+                # except:
+                #     if copyFileName not in failList:
+                #         failList.append(copyFileName)
         self.increaseIt(0)
         finish_time= time.perf_counter()
         if failList:
