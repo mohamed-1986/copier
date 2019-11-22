@@ -11,15 +11,11 @@ def TheSheet97(file):
         wb= xlrd.open_workbook(file)
         sheets = [ws for ws in wb.sheet_names() if ws =="EMC" or "AREA" in ws.upper()]
         return wb, sheets
-    elif file.endswith(".xlsx"):
-        wb= openpyxl.load_workbook(file)
-        sheets = [ws for ws in wb.sheetnames if ws =="EMC" or "AREA" in ws.upper()]
-        return wb, sheets
+    
 
 #Copy range of cells as a nested list.[{"Tag":"02-FT-010","Problem":"Blockage"},{"Tag":"04-FV-002","Problem":"Stuck"}]
 def copyRange(copyDict, sheet):
     startRow = searchRowStarting(sheet, "TAG")[0]
-    print(searchRowStarting(sheet, "TAG"))
     rangeSelected = []
     #Loops through selected Rows. the while is to loop until data is finished
     try:
@@ -28,7 +24,6 @@ def copyRange(copyDict, sheet):
             for j in copyDict:
                 try:
                     rowSelected[j] =str(sheet.cell(startRow, copyDict[j]).value)
-                    print("row select{}".format(rowSelected[j]))
             #Adds the RowSelected List and nests inside the rangeSelected   
                 except :
                     print("wrong index {}".format(j))
@@ -36,7 +31,6 @@ def copyRange(copyDict, sheet):
             startRow= startRow + 1
     except IndexError:
         pass
-    print(rangeSelected)
     return rangeSelected
 
 #Paste data from copyRange into template sheet
@@ -99,7 +93,6 @@ def searchForWordXlsx(sheet, theWord):
 
 # def moveData(copyFileName, copyFileSheet, pasteFileName, pasteFileSheet):
 def moveData97(copyFileName, copyFileSheet, pasteFileName):
-    print("Processing...")
     t0= time.perf_counter()
     if copyFileName.endswith(".xls"):
         wb = xlrd.open_workbook(copyFileName)
@@ -109,7 +102,6 @@ def moveData97(copyFileName, copyFileSheet, pasteFileName):
     pasteSheet= pasteFile.active
 
     pasteDict, copyDict, dateCopy= dictionaryxls( copyFileName, copySheet, pasteSheet)
-    print(pasteDict, copyDict, dateCopy)
     if searchRowStarting(copySheet,"TAG") != FileExistsError and searchRowStarting(copySheet,"TAG") != IndexError:
         t2= time.perf_counter()
         selectedRange = copyRange(copyDict, copySheet)
@@ -126,6 +118,8 @@ def moveData97(copyFileName, copyFileSheet, pasteFileName):
             "Pasting data takes{}".format(round(t4-t3 ,2))+"\n"+
             "saving files takes {}".format(round(t5-t4 ,2))+"\n"
         )
+
+
 def dictionaryxls(copyFileName, copySheet, pasteSheet ):
     copyDict={}
     pasteDict= {}
@@ -171,63 +165,6 @@ def dictionaryxls(copyFileName, copySheet, pasteSheet ):
         pass
     try:
         pasteDict["Date"]= searchForWordXlsx(pasteSheet,"DATE")[1]
-    except TypeError:
-        pass
-    return pasteDict, copyDict, dateCopy
-
-def dictionaries(copyFileName, copySheet, pasteSheet ):
-    copyDict={}
-    pasteDict= {}
-    olddateCopy = os.path.basename(copyFileName)
-    if  len(olddateCopy) < 16:
-        dateCopy = olddateCopy.split('.')[0]
-    else :
-        dateCopy= (olddateCopy.split('-')[-3])[-2] + (olddateCopy.split('-')[-3])[-1] +'-' 
-        dateCopy= dateCopy+ (olddateCopy.split('-')[-2]+'-'+ olddateCopy.split('-')[-1]).split('.')[-2]
-
-    try:
-        pasteDict["Tag"]= searchForWord(pasteSheet, "TAG")[1]
-    except TypeError:
-        pass
-
-    try:
-        copyDict["Tag"]= searchForWord(copySheet, "TAG")[1]
-    except TypeError:
-        pass
-    try:
-        pasteDict["Problem"]= searchForWord(pasteSheet,"PROB")[1]
-    except TypeError:
-        pass
-    try:
-        copyDict["Problem"]= searchForWord(copySheet,"PROB")[1]
-    except TypeError:
-        pass
-    try:
-        pasteDict["Complain"]= searchForWord(pasteSheet,"COMPLAIN")[1]
-    except TypeError:
-        pass
-    try:
-        copyDict["Complain"]= searchForWord(copySheet,"COMPLAIN")[1]
-    except:
-        pass
-    try:
-        pasteDict["Action"]= searchForWord(pasteSheet,"ACTION")[1]
-    except TypeError:
-        pass
-    try:
-        copyDict["Action"]= searchForWord(copySheet,"ACTION")[1]
-    except TypeError:
-        pass
-    try:
-        pasteDict["Status"]= searchForWord(pasteSheet,"STATUS")[1]
-    except TypeError:
-        pass
-    try:
-        copyDict["Status"]= searchForWord(copySheet,"STATUS")[1]
-    except TypeError:
-        pass
-    try:
-        pasteDict["Date"]= searchForWord(pasteSheet,"DATE")[1]
     except TypeError:
         pass
     return pasteDict, copyDict, dateCopy

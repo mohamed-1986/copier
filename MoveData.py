@@ -13,18 +13,19 @@ def copyRange(copyDict, sheet):
     rangeSelected = []
     #Loops through selected Rows. the while is to loop until data is finished
     try:
-        while "-" in sheet.cell(startRow, copyDict["Tag"]).value or "UNIT" in sheet.cell(startRow, copyDict["Tag"]).value.upper():
+        while '-' in str( sheet.cell(startRow, copyDict["Tag"]).value) or 'UNIT' in str(sheet.cell(startRow, copyDict["Tag"]).value).upper():
             rowSelected = {}
             for j in copyDict:
-                rowSelected[j] =str(sheet.cell(startRow, copyDict[j]).value)
-            #Adds the RowSelected List and nests inside the rangeSelected
+                try:
+                    rowSelected[j] =str(sheet.cell(startRow, copyDict[j]).value)
+            #Adds the RowSelected List and nests inside the rangeSelected   
+                except :
+                    print("wrong index {}".format(j))
             rangeSelected.append(rowSelected)
             startRow= startRow + 1
-        print("Copy was successful")
-        return rangeSelected
-    except Exception:
-        print("copying failed")
-        return IndexError
+    except IndexError:
+        pass
+    return rangeSelected
 
 #Paste data from copyRange into template sheet
 def pasteRange(copyDict, pasteDict, sheetReceiving, copiedData, datePaste):
@@ -49,14 +50,23 @@ def pasteRange(copyDict, pasteDict, sheetReceiving, copiedData, datePaste):
         countRow += 1
 #this returns the column place for the main headers ex. tag in column 2 and problem in column 3
 def searchRowStarting(sheet, theWord):
-    try:
-        i,j= searchForWordXlsx(sheet,theWord)
-        if '-' in sheet.cell(i+1,j).value or "UNIT" in sheet.cell(i+1,j).value.upper() :
-            return i+1, j, "first", sheet.cell(i+1,j).value
-        elif '-' in sheet.cell(i+2,j).value or "UNIT" in sheet.cell(i+2,j).value.upper():
-            return i+2, j, "second", sheet.cell(i+2,j).value           
-    except:
-        return FileExistsError
+    for i in range(1, 7,1):
+        #Appends the row to a RowSelected list
+        for j in range(1, 7,1):
+            try:
+                if theWord in str(sheet.cell(i,j).value).upper():
+                    if '-' in str(sheet.cell(i+1,j).value):
+                        return i+1, j, "first", sheet.cell(i+1,j).value
+                    elif '-' in str(sheet.cell(i+2,j).value):
+                        return i+2, j, "second", sheet.cell(i+2,j).value 
+                    elif 'UNIT' in str(sheet.cell(i+1,j).value).upper():
+                        return i+1, j, "first", sheet.cell(i+1,j).value
+                    elif 'UNIT' in str(sheet.cell(i+2 ,j).value).upper():
+                        return i+2, j, "first", sheet.cell(i+2 ,j).value
+                    else:
+                        return FileExistsError
+            except IndexError:
+                return FileExistsError
 
 def searchForWord(sheet, theWord):
     for i in range(1,sheet.nrows):
