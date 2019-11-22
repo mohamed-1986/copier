@@ -1,6 +1,5 @@
 #! Python 3
 import openpyxl ,datetime, os, xlrd
-import time
 
 def TheSheets(file):
     wb= openpyxl.load_workbook(file)

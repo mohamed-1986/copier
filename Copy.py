@@ -6,7 +6,6 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication
 from MoveData import  moveData, TheSheets
@@ -101,6 +100,7 @@ class Ui_MainWindow(object):
 
     def exiter(self):
         sys.exit(1)
+        
 
     def myFile(self):
         self.gg , _ = QtWidgets.QFileDialog.getOpenFileName(MainWindow)
