@@ -1,76 +1,118 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'FileName1.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication
 from MoveData import  moveData, TheSheets
 from MoveData_97 import moveData97, TheSheet97
 import os, time
+from PyQt5.QtCore import Qt
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(258, 138)
+        MainWindow.resize(279, 145)
         MainWindow.setAcceptDrops(False)
-        MainWindow.setStyleSheet("")
+        MainWindow.setStyleSheet("background-color: rgb(255, 255, 255);")
         MainWindow.setWindowFilePath("")
         MainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
         MainWindow.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.widget = QtWidgets.QWidget(self.centralwidget)
+        self.widget.setObjectName("widget")
+        self.gridLayout = QtWidgets.QGridLayout(self.widget)
         self.gridLayout.setObjectName("gridLayout")
-        self.pushButton_loadCopy = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_loadCopy.setStyleSheet("")
+        self.pushButton_loadCopy = QtWidgets.QPushButton(self.widget)
+        self.pushButton_loadCopy.setStyleSheet(
+"    background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);\n"
+"    background-color:#ffec64;\n"
+"    border-radius:9px;\n"
+"    border:1px solid #ffaa22;\n"
+"    color:#333333;\n"
+"    font-family:Arial;\n"
+"    font-size:14px;\n"
+"    font-weight:bold;\n"
+"    padding:5px 5px;\n"
+"    text-decoration:none;\n")
         self.pushButton_loadCopy.setObjectName("pushButton_loadCopy")
         self.gridLayout.addWidget(self.pushButton_loadCopy, 0, 0, 1, 1)
-        self.label_Copy = QtWidgets.QLabel(self.centralwidget)
+        self.label_Copy = QtWidgets.QLabel(self.widget)
         self.label_Copy.setStyleSheet("")
         self.label_Copy.setText("")
         self.label_Copy.setObjectName("label_Copy")
         self.gridLayout.addWidget(self.label_Copy, 0, 1, 1, 1)
-        self.pushButton_Start = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_Stop = QtWidgets.QPushButton(self.widget)
         font = QtGui.QFont()
-        font.setPointSize(10)
+        font.setFamily("Arial")
+        font.setPointSize(1)
         font.setBold(True)
+        font.setUnderline(False)
         font.setWeight(75)
-        self.pushButton_Start.setFont(font)
-        self.pushButton_Start.setStatusTip("")
-        self.pushButton_Start.setStyleSheet("")
-        self.pushButton_Start.setObjectName("pushButton_Start")
-        self.gridLayout.addWidget(self.pushButton_Start, 0, 2, 1, 1)
-        self.pushButton_laodPaste = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_laodPaste.setObjectName("pushButton_laodPaste")
-        self.gridLayout.addWidget(self.pushButton_laodPaste, 1, 0, 1, 1)
-        self.label_Paste = QtWidgets.QLabel(self.centralwidget)
-        self.label_Paste.setStyleSheet("")
-        self.label_Paste.setText("")
-        self.label_Paste.setObjectName("label_Paste")
-        self.gridLayout.addWidget(self.label_Paste, 1, 1, 1, 1)
-        self.pushButton_Stop = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
+        font.setStrikeOut(False)
         self.pushButton_Stop.setFont(font)
         self.pushButton_Stop.setStatusTip("")
+        self.pushButton_Stop.setStyleSheet(
+"    background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);\n"
+"    background-color:#ffec64;\n"
+"    border-radius:9px;\n"
+"    border:1px solid #ffaa22;\n"
+"    color:#333333;\n"
+"    font-family:Arial;\n"
+"    font-size:14px;\n"
+"    font-weight:bold;\n"
+"    padding:5px 5px;\n"
+"    text-decoration:none;\n")
         self.pushButton_Stop.setObjectName("pushButton_Stop")
         self.gridLayout.addWidget(self.pushButton_Stop, 1, 2, 1, 1)
-        self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
+        self.pushButton_Start = QtWidgets.QPushButton(self.widget)
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(1)
+        font.setBold(True)
+        font.setUnderline(False)
+        font.setWeight(75)
+        font.setStrikeOut(False)
+        self.pushButton_Start.setFont(font)
+        self.pushButton_Start.setStatusTip("")
+        self.pushButton_Start.setStyleSheet(
+"    background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);\n"
+"    background-color:#ffec64;\n"
+"    border-radius:9px;\n"
+"    border:1px solid #ffaa22;\n"
+"    color:#333333;\n"
+"    font-family:Arial;\n"
+"    font-size:14px;\n"
+"    font-weight:bold;\n"
+"    padding:5px 5px;\n"
+"    text-decoration:none;\n")
+        self.pushButton_Start.setObjectName("pushButton_Start")
+        self.gridLayout.addWidget(self.pushButton_Start, 0, 2, 1, 1)
+        self.pushButton_laodPaste = QtWidgets.QPushButton(self.widget)
+        self.pushButton_laodPaste.setStyleSheet(
+"    background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);\n"
+"    background-color:#ffec64;\n"
+"    border-radius:9px;\n"
+"    border:1px solid #ffaa22;\n"
+"    color:#333333;\n"
+"    font-family:Arial;\n"
+"    font-size:14px;\n"
+"    font-weight:bold;\n"
+"    padding:5px 5px;\n"
+"    text-decoration:none;\n")
+        self.pushButton_laodPaste.setObjectName("pushButton_laodPaste")
+        self.gridLayout.addWidget(self.pushButton_laodPaste, 1, 0, 1, 1)
+        self.progressBar = QtWidgets.QProgressBar(self.widget)
+        self.progressBar.setStyleSheet("")
         self.progressBar.setProperty("value", 0)
         self.progressBar.setTextVisible(False)
         self.progressBar.setObjectName("progressBar")
         self.gridLayout.addWidget(self.progressBar, 2, 0, 1, 3)
-        self.label_Status = QtWidgets.QLabel(self.centralwidget)
-        self.label_Status.setStyleSheet("")
-        self.label_Status.setText("")
-        self.label_Status.setObjectName("label_Status")
-        self.gridLayout.addWidget(self.label_Status, 3, 0, 1, 3)
+        self.label_Paste = QtWidgets.QLabel(self.widget)
+        self.label_Paste.setStyleSheet("")
+        self.label_Paste.setText("")
+        self.label_Paste.setObjectName("label_Paste")
+        self.gridLayout.addWidget(self.label_Paste, 1, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.widget, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -88,19 +130,19 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Activity Copier"))
         self.pushButton_loadCopy.setToolTip(_translate("MainWindow", "press to load activity folder"))
         self.pushButton_loadCopy.setText(_translate("MainWindow", "Copy Folder"))
+        self.pushButton_Stop.setToolTip(_translate("MainWindow", "press to exit"))
+        self.pushButton_Stop.setText(_translate("MainWindow", "Exit"))
         self.pushButton_Start.setToolTip(_translate("MainWindow", "press to copy"))
         self.pushButton_Start.setText(_translate("MainWindow", "Copy"))
         self.pushButton_laodPaste.setToolTip(_translate("MainWindow", "press to select a paste file"))
         self.pushButton_laodPaste.setText(_translate("MainWindow", "Paste File"))
-        self.pushButton_Stop.setToolTip(_translate("MainWindow", "press to exit"))
-        self.pushButton_Stop.setText(_translate("MainWindow", "Exit"))
+        self.statusbar.setToolTip(_translate("MainWindow", "here"))
 
     def loading_(self):
-        self.label_Status.setText("Loading.....")
+        self.statusbar.showMessage("Loading.....")
 
     def exiter(self):
         sys.exit(1)
-        
 
     def myFile(self):
         self.gg , _ = QtWidgets.QFileDialog.getOpenFileName(MainWindow)
@@ -128,7 +170,7 @@ class Ui_MainWindow(object):
                     for _ in wss:
                         no_of_Sheets= no_of_Sheets+1
             self.progressBar.setMaximum(no_of_Sheets)
-            self.label_Status.setText("{} files are found...".format( no_of_Files))
+            self.statusbar.showMessage("{} files are found...".format( no_of_Files))
             return self.hh
         except:
             self.label_Copy.setText("Please Enter correct folder")
@@ -153,7 +195,7 @@ class Ui_MainWindow(object):
 
     def start(self, pasteFileName, copyFolder):
         start_time= time.perf_counter()
-        self.label_Status.setText("In progress....")
+        self.statusbar.showMessage("In progress....")
         os.chdir(copyFolder)
         ff= os.listdir(copyFolder)
         f97=[sf for sf in ff if sf.endswith('.xls')]
@@ -172,7 +214,7 @@ class Ui_MainWindow(object):
                 self.increaseIt(ind2)
                 try:
                     messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
-                    self.label_Status.setText(messageInProgress)
+                    self.statusbar.showMessage(messageInProgress)
                     moveData97(copyFileName, copyFileSheet, pasteFileName)
                     if copyFileName not in successList:
                         successList.append(copyFileName)
@@ -186,7 +228,7 @@ class Ui_MainWindow(object):
             for copyFileSheet in wss:
                 try:
                     messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
-                    self.label_Status.setText(messageInProgress)
+                    self.statusbar.showMessage(messageInProgress)
                     moveData(copyFileName, copyFileSheet, pasteFileName)
                     ind2= ind2+1
                     self.increaseIt(ind2)
@@ -203,7 +245,8 @@ class Ui_MainWindow(object):
         if failList:
             message1= "\n"+"Failed to copy {} files".format(len(failList))
         
-        self.label_Status.setText(message +message1)
+        self.statusbar.showMessage(message +message1)
+        
 
 
 if __name__ == "__main__":
