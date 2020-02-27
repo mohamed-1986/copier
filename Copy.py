@@ -1,10 +1,12 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QDialog, QWidget
 from MoveData import  moveData, TheSheets
 from MoveData_97 import moveData97, TheSheet97
 import os, time
 from PyQt5.QtCore import Qt
-
+from message import Ui_Dialog
+import json
+from pathlib import PurePath as p
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -138,6 +140,16 @@ class Ui_MainWindow(object):
         self.pushButton_laodPaste.setText(_translate("MainWindow", "Paste File"))
         self.statusbar.setToolTip(_translate("MainWindow", "here"))
 
+    def OtherWindow(self,text):
+        print(text)
+        self.window= QtWidgets.QDialog()
+        self.ui= Ui_Dialog(text)
+        self.ui.setupUi(self.window)
+        # self.ui.retranslateUi(text)
+        self.window.show()
+
+
+
     def loading_(self):
         self.statusbar.showMessage("Loading.....")
 
@@ -206,47 +218,66 @@ class Ui_MainWindow(object):
         successList=[]
         failList=[]
 
-
+        # Copy sheets of .xls format into the paste file .xlsx
         for copyFileName in f97:
             _ , wss= TheSheet97(copyFileName)
             for copyFileSheet in wss:
                 ind2= ind2+1
                 self.increaseIt(ind2)
-                try:
-                    messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
-                    self.statusbar.showMessage(messageInProgress)
-                    moveData97(copyFileName, copyFileSheet, pasteFileName)
-                    if copyFileName not in successList:
-                        successList.append(copyFileName)
-                except:
-                    if copyFileName not in failList:
-                        failList.append(copyFileName)
+                messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
+                self.statusbar.showMessage(messageInProgress)
+                result= moveData97(copyFileName, copyFileSheet, pasteFileName)
+                if result ==True:
+                    successList.append([copyFileName,copyFileSheet])
+                else:
+                    failList.append([copyFileName,copyFileSheet])
 
 
+
+        # Copy sheets of .xlsx format into the paste file .xlsx
         for copyFileName in f:
             _ , wss= TheSheets(copyFileName)
             for copyFileSheet in wss:
-                try:
-                    messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
-                    self.statusbar.showMessage(messageInProgress)
-                    moveData(copyFileName, copyFileSheet, pasteFileName)
-                    ind2= ind2+1
-                    self.increaseIt(ind2)
-                    if copyFileName not in successList:
-                        successList.append(copyFileName)
+                ind2= ind2+1
+                self.increaseIt(ind2)
+                messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
+                self.statusbar.showMessage(messageInProgress)
+                try:    
+                    result=moveData(copyFileName, copyFileSheet, pasteFileName)
+                    if result== True:
+                        # if copyFileName not in successList:
+                        successList.append([copyFileName,copyFileSheet])
+                    else:
+                        # if copyFileName not in failList:
+                        failList.append([copyFileName,copyFileSheet])
+
                 except:
-                    if copyFileName not in failList:
-                        failList.append(copyFileName)
-        
+                    # if copyFileName not in failList:
+                    failList.append([copyFileName,copyFileSheet])
         self.increaseIt(0)
         finish_time= time.perf_counter()
         if successList:
-            message= 'Copied {} files in {} Second(s)'.format( len(successList), round(finish_time- start_time, 2))
+            message= 'Copied {} Sheets in {} Seconds'.format( len(successList), round(finish_time- start_time, 2))
         if failList:
-            message1= "\n"+"Failed to copy {} files".format(len(failList))
+            message1= "\n"+"Failed to copy {} Sheets".format(failList)
         
         self.statusbar.showMessage(message +message1)
-        
+        mList= message+message1
+        self.make(mList)
+        # OtherWindow.Messageboxlabel.setText("Not Hello")
+        # self.OtherWindow("pop")
+
+    def make(self, mList):
+        pasteDirectory= os.path.dirname(self.gg)
+        LogFileLocation= p(pasteDirectory). joinpath('lastStatus.txt')
+        if mList:
+            print(mList)
+            writer= open(LogFileLocation,'w')
+            writer.write(mList)
+            writer.close()
+            # with open(LogFileLocation, 'w') as F:
+            #     json.dump(mList, F)
+
 
 
 if __name__ == "__main__":
