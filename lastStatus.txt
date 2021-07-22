@@ -1,2 +1,0 @@
-Copied 5 Sheets in 6.75 Seconds
-Failed to copy [['06-03-2019.xls', 'Area 02'], ['06-03-2019.xls', 'Area 04']] Sheets

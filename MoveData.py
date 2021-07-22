@@ -1,10 +1,22 @@
 #! Python 3
-import openpyxl ,datetime, os, xlrd
+import openpyxl ,datetime, os, xlrd, re
 
 def TheSheets(file):
     wb= openpyxl.load_workbook(file)
     sheets = [ws for ws in wb.sheetnames if ws =="EMC" or "AREA" in ws.upper()]
     return wb, sheets
+
+    
+def Area(Tag):
+    unit= re.findall('\d+', Tag)[0]
+    if unit in ['51','52','53','54','55','56','57','58']:
+        return "A4/"+ unit
+    if unit in ['02','03','04','05','06','12','16','39']:
+        return "2A/"+ unit
+    if unit in ['07','13','14','15','45']:
+        return "2B/"+ unit
+    else:
+        return unit
 
 #Copy range of cells as a nested list.[{"Tag":"02-FT-010","Problem":"Blockage"},{"Tag":"04-FV-002","Problem":"Stuck"}]
 def copyRange(copyDict, sheet):
@@ -46,6 +58,10 @@ def pasteRange(copyDict, pasteDict, sheetReceiving, copiedData, datePaste):
         #  Second we paste corrsponding data: tag of copy with tag of paste, problem with problem, etc..
         for j in copyDict:   #for every column, we paste matched tags
             sheetReceiving.cell(i,pasteDict[j] ).value = copiedData[countRow][j]
+        try:
+            sheetReceiving.cell(i,pasteDict["Loc"]).value = Area(sheetReceiving.cell(i,pasteDict["Tag"]).value)
+        except:
+            pass
         countRow += 1
 #this returns the column place for the main headers ex. tag in column 2 and problem in column 3
 def searchRowStarting(sheet, theWord):
@@ -95,11 +111,16 @@ def moveData(copyFileName, copyFileSheet, pasteFileName):
         copySheet= wb[copyFileSheet]
         pasteDict, copyDict, dateCopy= dictionaryxlsx( copyFileName, copySheet, pasteSheet)
 
-    if searchRowStarting(copySheet,"TAG") != FileExistsError:
-        selectedRange = copyRange(copyDict, copySheet)
-        pasteRange(copyDict, pasteDict, pasteSheet, selectedRange, dateCopy) 
-        #You can save the template as another file to create a new file here too
-        pasteFile.save(pasteFileName)
+    try:
+        if searchRowStarting(copySheet,"TAG") != FileExistsError:
+            selectedRange = copyRange(copyDict, copySheet)
+            pasteRange(copyDict, pasteDict, pasteSheet, selectedRange, dateCopy) 
+            #You can save the template as another file to create a new file here too
+            pasteFile.save(pasteFileName)
+            return True
+    except:
+        return False
+
 
 
 def dictionaryxlsx(copyFileName, copySheet, pasteSheet ):
@@ -111,9 +132,14 @@ def dictionaryxlsx(copyFileName, copySheet, pasteSheet ):
     else :
         dateCopy= (olddateCopy.split('-')[-3])[-2] + (olddateCopy.split('-')[-3])[-1] +'-' 
         dateCopy= dateCopy+ (olddateCopy.split('-')[-2]+'-'+ olddateCopy.split('-')[-1]).split('.')[-2]
-
+    dateCopy= dateCopy.replace('-','/')
     try:
         pasteDict["Tag"]= searchForWordXlsx(pasteSheet, "TAG")[1]
+    except TypeError:
+        pass
+
+    try:
+        pasteDict["Loc"]= searchForWordXlsx(pasteSheet, "LOC")[1]
     except TypeError:
         pass
 

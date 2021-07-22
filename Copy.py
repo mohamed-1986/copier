@@ -4,9 +4,9 @@ from MoveData import  moveData, TheSheets
 from MoveData_97 import moveData97, TheSheet97
 import os, time
 from PyQt5.QtCore import Qt
-from message import Ui_Dialog
-import json
 from pathlib import PurePath as p
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -140,16 +140,6 @@ class Ui_MainWindow(object):
         self.pushButton_laodPaste.setText(_translate("MainWindow", "Paste File"))
         self.statusbar.setToolTip(_translate("MainWindow", "here"))
 
-    def OtherWindow(self,text):
-        print(text)
-        self.window= QtWidgets.QDialog()
-        self.ui= Ui_Dialog(text)
-        self.ui.setupUi(self.window)
-        # self.ui.retranslateUi(text)
-        self.window.show()
-
-
-
     def loading_(self):
         self.statusbar.showMessage("Loading.....")
 
@@ -211,7 +201,9 @@ class Ui_MainWindow(object):
         os.chdir(copyFolder)
         ff= os.listdir(copyFolder)
         f97=[sf for sf in ff if sf.endswith('.xls')]
+        f97.sort(key= os.path.getmtime)
         f= [sf for sf in ff if sf.endswith('.xlsx')]
+        f.sort(key= os.path.getmtime)
         ind2=0
         message=""
         message1=""
@@ -233,7 +225,6 @@ class Ui_MainWindow(object):
                     failList.append([copyFileName,copyFileSheet])
 
 
-
         # Copy sheets of .xlsx format into the paste file .xlsx
         for copyFileName in f:
             _ , wss= TheSheets(copyFileName)
@@ -245,39 +236,29 @@ class Ui_MainWindow(object):
                 try:    
                     result=moveData(copyFileName, copyFileSheet, pasteFileName)
                     if result== True:
-                        # if copyFileName not in successList:
                         successList.append([copyFileName,copyFileSheet])
                     else:
-                        # if copyFileName not in failList:
                         failList.append([copyFileName,copyFileSheet])
-
                 except:
-                    # if copyFileName not in failList:
                     failList.append([copyFileName,copyFileSheet])
+        
         self.increaseIt(0)
         finish_time= time.perf_counter()
         if successList:
             message= 'Copied {} Sheets in {} Seconds'.format( len(successList), round(finish_time- start_time, 2))
         if failList:
-            message1= "\n"+"Failed to copy {} Sheets".format(failList)
-        
+            message1= "\n"+"Failed to copy {} Sheets".format(failList)    
         self.statusbar.showMessage(message +message1)
-        mList= message+message1
-        self.make(mList)
-        # OtherWindow.Messageboxlabel.setText("Not Hello")
-        # self.OtherWindow("pop")
+        mList= os.path.basename(copyFolder) + " : " + message+ message1+ "\n"
+        self.exportToLastStatus(mList)
 
-    def make(self, mList):
+    def exportToLastStatus(self, mList):
         pasteDirectory= os.path.dirname(self.gg)
-        LogFileLocation= p(pasteDirectory). joinpath('lastStatus.txt')
+        LogFileLocation= p(pasteDirectory). joinpath('log.txt')
         if mList:
-            print(mList)
-            writer= open(LogFileLocation,'w')
+            writer= open(LogFileLocation,'a')
             writer.write(mList)
             writer.close()
-            # with open(LogFileLocation, 'w') as F:
-            #     json.dump(mList, F)
-
 
 
 if __name__ == "__main__":
