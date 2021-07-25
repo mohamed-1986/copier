@@ -5,7 +5,6 @@ import openpyxl ,datetime, os, xlrd, re
 # file name is given, the output is sheets to copy from
 import time
 
-
 def TheSheet97(file):
     if file.endswith(".xls"):
         wb= xlrd.open_workbook(file)
@@ -26,6 +25,7 @@ def Area(Tag):
 
 #Copy range of cells as a nested list.[{"Tag":"02-FT-010","Problem":"Blockage"},{"Tag":"04-FV-002","Problem":"Stuck"}]
 def copyRange(copyDict, sheet):
+    print("start copying ************************************************")
     startRow = searchRowStarting(sheet, "TAG")[0]
     rangeSelected = []
     #Loops through selected Rows. the while is to loop until data is finished
@@ -46,6 +46,7 @@ def copyRange(copyDict, sheet):
 
 #Paste data from copyRange into template sheet
 def pasteRange(copyDict, pasteDict, sheetReceiving, copiedData, datePaste):
+    print("start Pasting..............................................................")
     countRow = 0
     startRow= sheetReceiving.max_row +1
     # #Check last row that it is not empty
@@ -108,6 +109,7 @@ def searchForWordXlsx(sheet, theWord):
 
 # def moveData(copyFileName, copyFileSheet, pasteFileName, pasteFileSheet):
 def moveData97(copyFileName, copyFileSheet, pasteFileName):
+    print("start move97")
     # t0= time.perf_counter()
     if copyFileName.endswith(".xls"):
         wb = xlrd.open_workbook(copyFileName)
@@ -117,16 +119,18 @@ def moveData97(copyFileName, copyFileSheet, pasteFileName):
     pasteSheet= pasteFile.active
 
     pasteDict, copyDict, dateCopy= dictionaryxls( copyFileName, copySheet, pasteSheet)
+    print(pasteDict, copyDict, dateCopy)
     try:
         if searchRowStarting(copySheet,"TAG") != FileExistsError and searchRowStarting(copySheet,"TAG") != IndexError:
             selectedRange = copyRange(copyDict, copySheet)
-            pasteRange(copyDict, pasteDict, pasteSheet, selectedRange, dateCopy) 
+            pasteRange(copyDict, pasteDict, pasteSheet, selectedRange, dateCopy)
             pasteFile.save(pasteFileName)
             return True
     except:
         return False
 
 def dictionaryxls(copyFileName, copySheet, pasteSheet ):
+    print("start dict")
     copyDict={}
     pasteDict= {}
     olddateCopy = os.path.basename(copyFileName)

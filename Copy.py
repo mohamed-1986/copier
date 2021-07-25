@@ -5,7 +5,8 @@ from MoveData_97 import moveData97, TheSheet97
 import os, time
 from PyQt5.QtCore import Qt
 from pathlib import PurePath as p
-
+from streamlit import caching
+caching.clear_cache()
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -219,6 +220,7 @@ class Ui_MainWindow(object):
                 messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
                 self.statusbar.showMessage(messageInProgress)
                 result= moveData97(copyFileName, copyFileSheet, pasteFileName)
+                print(result)
                 if result ==True:
                     successList.append([copyFileName,copyFileSheet])
                 else:
@@ -234,7 +236,10 @@ class Ui_MainWindow(object):
                 messageInProgress= "In progress.... Copy {} ({})".format(copyFileName, copyFileSheet)
                 self.statusbar.showMessage(messageInProgress)
                 try:    
+                    time.sleep(0.05)
+
                     result=moveData(copyFileName, copyFileSheet, pasteFileName)
+                    
                     if result== True:
                         successList.append([copyFileName,copyFileSheet])
                     else:
